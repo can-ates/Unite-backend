@@ -1,0 +1,23 @@
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const communitySchema = mongoose.Schema({
+    title:{
+        type:String,
+        required: true,
+        unique: 1
+    },
+    founder: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    members: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    }]
+    
+}, {timestamps: true});
+
+const Community = mongoose.model('Community', communitySchema);
+module.exports = { Community }
