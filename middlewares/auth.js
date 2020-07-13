@@ -5,7 +5,7 @@ require('dotenv').config()
 let auth = (req,res,next) => {
     let token = req.cookies.u_auth;
 
-    console.log(token)
+    
 
     jwt.verify(token, process.env.SECRET,function(err, userId){
         

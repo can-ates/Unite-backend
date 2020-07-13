@@ -20,9 +20,12 @@ app.use(cookieParser());
 //Models
 const { User } = require('./models/user');
 const { Community } = require('./models/community');
+const { Post } = require('./models/post');
+const { Comment } = require('./models/comment');
 
 //Middlewares
 const { auth } = require('./middlewares/auth');
+
 
 app.get('/', (req, res) => {
     res.send('Hello World')
@@ -31,8 +34,46 @@ app.get('/', (req, res) => {
 
 //------COMMUNITY--------//
 app.post('/api/community/add-community', auth, (req, res) => {
-    console.log(req.body, req.user)
+
+    Community.findOne({'title': req.body.title}, (err, community) => {
+        if(community) return res.json({createFailed: true, message: 'Community already exists'})
+
+        const com = new Community({
+            founder: req.user._id,
+            title: req.body.title,
+        })
+
+        com.save((err, doc) => {
+            if(err) return err
+
+            res.status(200).json({doc})
+        })
+
+    })
 })
+
+app.post('/api/community/:id/beMember', auth, (req, res) => {
+
+    Community.findOne({'_id': req.params.id}, (err, community) => {
+        if(!community) return res.json({memberFailed: true, message: 'Community could not be find'})
+
+        Community.findOne({'members': req.user._id}, (err, user) => {
+            
+            if(JSON.stringify(req.user._id) === JSON.stringify(community.founder)) return res.json({memberFailed: true, message: "You are the founder, geez"})
+
+            if(user) return res.json({memberFailed: true, message: 'You are already member of the community'})
+
+            community.members.push(req.user._id)
+
+            community.save((err, doc) => {
+                if(err) return err
+    
+                res.status(200).json({doc})
+            })
+        })
+    })
+})
+
 
 
 
@@ -81,6 +122,7 @@ app.post('/api/users/login',(req,res)=>{
             res.cookie('u_auth', token, {httpOnly: true}).status(200).json({
                 loginSucess: true
             })
+
         })
     })
 })
@@ -88,7 +130,6 @@ app.post('/api/users/login',(req,res)=>{
 
 
 app.get('/api/users/logout', (req,res)=>{
-    res.cookie()
     res.clearCookie('u_auth')
     res.json({message: 'Cookie cleared'})
 })
