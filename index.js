@@ -25,6 +25,7 @@ const { Comment } = require('./models/comment');
 
 //Middlewares
 const { auth } = require('./middlewares/auth');
+const { isMember } = require('./middlewares/isMember');
 
 
 app.get('/', (req, res) => {
@@ -42,6 +43,7 @@ app.post('/api/community/add-community', auth, (req, res) => {
             founder: req.user._id,
             title: req.body.title,
         })
+
 
         com.save((err, doc) => {
             if(err) return err
@@ -72,6 +74,27 @@ app.post('/api/community/:id/beMember', auth, (req, res) => {
             })
         })
     })
+})
+
+app.post('/api/community/:id/add-post', auth, isMember, (req, res) => {
+    const {title, description} = req.body;
+    const post = new Post({
+        title,
+        description,
+        author: req.user._id,
+    })
+
+    post.save(() => {
+        req.community.posts.push(post)
+
+        req.community.save((err, doc) => {
+            if(err) return err
+    
+            res.status(200).json({doc})
+        })
+    })
+
+    
 })
 
 
