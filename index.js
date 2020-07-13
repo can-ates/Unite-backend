@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 const express = require('express');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser'); 
 
 const app = express()
@@ -21,9 +19,6 @@ app.use(cookieParser());
 //Routes
 const userRoutes    = require("./routes/users")
 const communityRoutes    = require("./routes/communities")
-
-//Middlewares
-
 
 
 app.get('/', (req, res) => {

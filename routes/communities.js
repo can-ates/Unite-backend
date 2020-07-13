@@ -2,13 +2,13 @@ const express = require('express');
 
 const { User } = require('../models/user');
 const { Community } = require('../models/community');
+const { Comment } = require('../models/comment');
 const { Post } = require('../models/post');
 
 const { auth } = require('../middlewares/auth');
 const { isMember } = require('../middlewares/isMember');
 
 var router  = express.Router();
-
 
 
 router.post('/api/community/add-community', auth, (req, res) => {
@@ -23,9 +23,9 @@ router.post('/api/community/add-community', auth, (req, res) => {
 
 
         com.save((err, doc) => {
-            if(err) return err
+            err ? res.json({err}) : res.status(200).json({doc})
 
-            res.status(200).json({doc})
+            
         })
 
     })
@@ -45,15 +45,15 @@ router.post('/api/community/:id/beMember', auth, (req, res) => {
             community.members.push(req.user._id)
 
             community.save((err, doc) => {
-                if(err) return err
-    
-                res.status(200).json({doc})
+
+                err ? res.json({err}) : res.status(200).json({doc})
+
             })
         })
     })
 })
 
-router.post('/api/community/:id/add-post', auth, isMember, (req, res) => {
+router.post('/api/community/:id/create-post', auth, isMember, (req, res) => {
     const {title, description} = req.body;
     const post = new Post({
         title,
@@ -65,29 +65,31 @@ router.post('/api/community/:id/add-post', auth, isMember, (req, res) => {
         req.community.posts.push(post)
 
         req.community.save((err, doc) => {
-            if(err) return err
 
-            res.status(200).json({doc})
+            err ? res.json({err}) : res.status(200).json({doc})
+
         })
     })
 })
 
 
 router.post('/api/community/:id/:postId', auth, isMember, (req, res) => {
-    const {title, description} = req.body;
-    const post = new Post({
-        title,
-        description,
-        author: req.user._id,
+    const comment = new Comment({
+        text: req.body.text,
+        author: req.user._id
     })
 
-    post.save((err,doc) => {
-        req.community.posts.push(post)
+    comment.save((err, cmnt) => {
+        Post.findOne({'_id': req.params.postId}, (err, post) =>{
 
-        req.community.save((err, doc) => {
-            if(err) return err
+            err ? res.json({err}) : post.comments.push(comment)
 
-            res.status(200).json({doc})
+            post.save((err, doc) => {
+
+                err ? res.json({err}) : res.status(200).json({doc})
+
+            })
+
         })
     })
 })

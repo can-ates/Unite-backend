@@ -5,7 +5,8 @@ const communitySchema = mongoose.Schema({
     title:{
         type:String,
         required: true,
-        unique: 1
+        unique: 1,
+        maxlength: 15
     },
     founder: {
         type: Schema.Types.ObjectId,
