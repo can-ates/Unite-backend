@@ -1,7 +1,7 @@
 # Unite-backend
-Early backend stages of community platform app
+Back-end of community platform app
 
-I am currently building spectrum chat alike app and
+I am currently developing spectrum chat alike app.
 Node.js     
 Express.js   
 MongoDB     
