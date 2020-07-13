@@ -15,6 +15,7 @@ let isMember = (req,res,next) => {
 
             if(!user){
                 if(JSON.stringify(req.user._id) === JSON.stringify(community.founder)){
+                    req.community = community
                     next()
                 } 
                 else return res.json({notMember: true, message: 'You should be member, in order to add post'})  
