@@ -2,7 +2,6 @@ const express = require('express');
 
 const { User } = require('../models/user');
 const { Community } = require('../models/community');
-const { Comment } = require('../models/comment');
 const { Post } = require('../models/post');
 
 const { auth } = require('../middlewares/auth');
@@ -10,6 +9,23 @@ const { isMember } = require('../middlewares/isMember');
 
 var router  = express.Router();
 
+//ALL COMMUNITIES
+router.get('/api/allCommunities', (req, res) => {
+    Community.find().populate('founder').select('-posts -email').exec((err, community) => {
+        
+        err ? res.status(400).json({err}) : res.status(200).json({community})
+    })
+})
+
+//ONE COMMUNITY
+router.get('/api/community/:id', (req, res) => {
+    Community.findById(req.params.id)
+            .populate('members')
+            .populate('posts').exec((err, community) => {
+
+            err ? res.status(400).json({err}) : res.status(200).json({community})
+    })
+})
 
 router.post('/api/community/add-community', auth, (req, res) => {
 
@@ -33,7 +49,7 @@ router.post('/api/community/add-community', auth, (req, res) => {
 
 router.post('/api/community/:id/beMember', auth, (req, res) => {
 
-    Community.findOne({'_id': req.params.id}, (err, community) => {
+    Community.findById({'_id': req.params.id}, (err, community) => {
         if(!community) return res.json({memberFailed: true, message: 'Community could not be find'})
 
         Community.findOne({'members': req.user._id}, (err, user) => {
@@ -74,24 +90,25 @@ router.post('/api/community/:id/create-post', auth, isMember, (req, res) => {
 
 
 router.post('/api/community/:id/:postId', auth, isMember, (req, res) => {
-    const comment = new Comment({
-        text: req.body.text,
-        author: req.user._id
-    })
 
-    comment.save((err, cmnt) => {
-        Post.findOne({'_id': req.params.postId}, (err, post) =>{
+    const comment = {
+        user : req.user._id,
+        name : req.user.name,
+        text : req.body.text
+    }
+
+        Post.findById({'_id': req.params.postId}, (err, post) =>{
 
             err ? res.json({err}) : post.comments.push(comment)
 
-            post.save((err, doc) => {
+            post.save((err, newPost) => {
 
-                err ? res.json({err}) : res.status(200).json({doc})
+                err ? res.json({err}) : res.status(200).json({newPost})
 
             })
 
         })
-    })
+    
 })
 
 module.exports = router;

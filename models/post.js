@@ -16,10 +16,26 @@ const postSchema = mongoose.Schema({
         ref: 'User',
         required: true
     },
-    comments :[{
-        type:Schema.Types.ObjectId,
-        ref: 'Comment'
-    }],
+    comments: [
+        {
+          user: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+          },
+          text: {
+            type: String,
+            required: true
+          },
+          name: {
+            type: String
+          },
+          date: {
+            type: Date,
+            default: Date.now
+          }
+        }
+      ],
     
 });
 
