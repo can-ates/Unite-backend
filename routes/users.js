@@ -1,35 +1,49 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const {body, check, validationResult} = require('express-validator')
 
 const { User } = require('../models/user');
 
 var router  = express.Router();
 
 
-router.post('/api/users/register', (req, res) => {
+router.post('/api/users/register',
+    [
+        check('email').isEmail().withMessage('not a valid email'),
+        check('password').isLength({min: 9}).withMessage('must be at least 9 chars long')
+    ]
+    ,
+    (req, res) => {
+    
+    if(validationResult(req).isEmpty()) {
+        const user = new User(req.body);
 
-    const user = new User(req.body);
-
-    bcrypt.genSalt(10, function(err,salt){ //generated salt for hash process
-        if(err) return err;
-
-        //HASHED PASSWORD
-        bcrypt.hash(user.password ,salt, function(err,hash){
+        bcrypt.genSalt(10, function(err,salt){ //generated salt for hash process
             if(err) return err;
-            user.password = hash;
-            
-            user.save((err,doc)=> {     //doc is the body that we provided
-                if(err) return res.json({success:false, err});
+    
+            //HASHED PASSWORD
+            bcrypt.hash(user.password ,salt, function(err,hash){
+                if(err) return err;
+                user.password = hash;
                 
-                const token = jwt.sign(user._id.toHexString(), process.env.SECRET);
-        
-                res.cookie('u_auth', token, {httpOnly: true}).status(200).json({
-                    registerSucess: true
+                user.save((err,doc)=> {     //doc is the body that we provided
+                    if(err) return res.json({success:false, err});
+                    
+                    const token = jwt.sign(user._id.toHexString(), process.env.SECRET);
+            
+                    res.cookie('u_auth', token, {httpOnly: true}).status(200).json({
+                        registerSuccess: true,
+                        doc
+                    })
                 })
             })
-        })
-    })    
+        })   
+    } else
+        return res.json(validationResult(req))
+    
+
+     
     
 })
 
