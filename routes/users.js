@@ -3,10 +3,20 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {body, check, validationResult} = require('express-validator')
 
+const { auth } = require('../middlewares/auth');
 const { User } = require('../models/user');
 
 var router  = express.Router();
 
+
+router.get('/api/users/auth', auth, (req,res)=>{
+    res.status(200).json({
+        isAuth: true,
+        email: req.user.email,
+        name: req.user.name,
+        lastname: req.user.lastname,
+    })
+})
 
 router.post('/api/users/register',
     [
@@ -32,9 +42,11 @@ router.post('/api/users/register',
                     
                     const token = jwt.sign(user._id.toHexString(), process.env.SECRET);
             
-                    res.cookie('u_auth', token, {httpOnly: true}).status(200).json({
+                    resInit.cookie('u_auth', token).status(200).json({
                         registerSuccess: true,
-                        doc
+                        doc,
+                        isAuth: true,
+                        
                     })
                 })
             })
@@ -47,9 +59,10 @@ router.post('/api/users/register',
     
 })
 
-router.post('/api/users/login',(req,res)=>{
+router.post('/api/users/login', (req,res) => {
     User.findOne({'email':req.body.email},(err,user)=>{
 
+        
         if(!user) return res.json({loginSuccess:false, message:'Email or Password is not correct'});
 
 
@@ -59,10 +72,10 @@ router.post('/api/users/login',(req,res)=>{
             if(!isMatch) return res.json({loginSuccess:false, message:'Email or Password is not correct'});
 
             const token = jwt.sign(user._id.toHexString(), process.env.SECRET);
+            
+            res.cookie('u_auth', token, {maxAge: 900000, httpOnly: true})
 
-            res.cookie('u_auth', token, {httpOnly: true}).status(200).json({
-                loginSucess: true
-            })
+            res.json({isAuth: true, user})
 
         })
     })

@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 
 const app = express()
 var bodyParser = require('body-parser')
+
 var cors = require('cors');
 require('dotenv').config()
 
@@ -14,10 +15,22 @@ mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopolo
 mongoose.set('useCreateIndex', true)
 mongoose.Promise = global.Promise;
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+  res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+  next()
+})
+
+
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(cors())
+// app.use(cors({credentials: true}))
+
+
+
 
 
 //Routes
