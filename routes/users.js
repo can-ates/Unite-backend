@@ -42,7 +42,7 @@ router.post('/api/users/register',
                     
                     const token = jwt.sign(user._id.toHexString(), process.env.SECRET);
             
-                    resInit.cookie('u_auth', token).status(200).json({
+                    res.cookie('u_auth', token).status(200).json({
                         registerSuccess: true,
                         doc,
                         isAuth: true,
@@ -85,7 +85,7 @@ router.post('/api/users/login', (req,res) => {
 
 router.get('/api/users/logout', (req,res)=>{
     res.clearCookie('u_auth')
-    res.json({message: 'Cookie cleared'})
+    res.json({message: 'Cookie cleared', isAuth: false})
 })
 
 

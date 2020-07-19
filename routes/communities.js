@@ -11,7 +11,19 @@ var router  = express.Router();
 
 //ALL COMMUNITIES
 router.get('/api/allCommunities', (req, res) => {
-    Community.find().populate('founder').select('-posts -email').exec((err, community) => {
+
+    let order = req.query.order ? req.query.order : 'asc';
+    let sortBy = req.query.sortBy ? req.query.sortBy : "_id";
+    let limit = req.query.limit ? parseInt(req.query.limit) : 20
+    
+    Community.
+    find().
+    populate('founder', '-password').
+    populate('members').
+    sort([[sortBy, order]]).
+    limit(limit).
+    select('-posts').
+    exec((err, community) => {
         
         err ? res.status(400).json({err}) : res.status(200).json({community})
     })
@@ -52,7 +64,8 @@ router.post('/api/community/:id/beMember', auth, (req, res) => {
     Community.findById({'_id': req.params.id}, (err, community) => {
         if(!community) return res.json({memberFailed: true, message: 'Community could not be find'})
 
-        Community.findOne({'members': req.user._id}, (err, user) => {
+        Community.where({'_id': req.params.id}).findOne({'members': req.user._id}, (err, user) => {
+            
             
             if(JSON.stringify(req.user._id) === JSON.stringify(community.founder)) return res.json({memberFailed: true, message: "You are the founder, geez"})
 
