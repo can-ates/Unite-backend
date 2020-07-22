@@ -6,12 +6,21 @@ const communitySchema = mongoose.Schema({
         type:String,
         required: true,
         unique: 1,
-        maxlength: 15
+        maxlength: 20
     },
     founder: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+    image: {
+        type: String,
+        required: true
+    },
+    description: {
+        type: String,
+        required: true,
+        maxlength: 200
     },
     members: [{
         type: Schema.Types.ObjectId,
