@@ -17,7 +17,7 @@ let auth = (req,res,next) => {
             if(!user) return res.json({
                 isAuth: false,
             })
-
+            console.log(user)
             req.user = user
             next();
         }).select('-password')

@@ -42,6 +42,7 @@ app.use(cookieParser());
 //Routes
 const userRoutes    = require("./routes/users")
 const communityRoutes    = require("./routes/communities")
+const postRoutes    = require("./routes/posts")
 
 
 app.get('/', (req, res) => {
@@ -52,6 +53,7 @@ app.get('/', (req, res) => {
 //Routes as a middleware
 app.use(userRoutes);
 app.use(communityRoutes);
+app.use(postRoutes);
 
 
 

@@ -25,6 +25,7 @@ router.get('/api/allCommunities', (req, res) => {
     let order = req.query.order ? req.query.order : 'asc';
     let sortBy = req.query.sortBy ? req.query.sortBy : "_id";
     let limit = req.query.limit ? parseInt(req.query.limit) : 20
+    let skip = req.query.skip ? parseInt(req.query.skip) : 0
     
     Community.
     find().
@@ -32,6 +33,7 @@ router.get('/api/allCommunities', (req, res) => {
     populate('members').
     sort([[sortBy, order]]).
     limit(limit).
+    skip(skip).
     select('-posts').
     exec((err, community) => {
         
@@ -62,11 +64,18 @@ router.get('/api/searchCommunities', (req, res) => {
 router.get('/api/community/:id', (req, res) => {
     Community.findById(req.params.id)
             .populate('members')
-            .populate('posts').exec((err, community) => {
+            .populate({
+                path: 'posts',
+                populate: {
+                    path: 'author'
+                }
+            }).exec((err, community) => {
 
             err ? res.status(400).json({err}) : res.status(200).json({community})
     })
 })
+
+
 
 router.post('/api/community/uploadimage', formidable(), (req, res) => {
     cloudinary.uploader.upload(req.files.file.path, (result) => {
@@ -132,46 +141,7 @@ router.post('/api/community/:id/beMember', auth, (req, res) => {
     })
 })
 
-router.post('/api/community/:id/create-post', auth, isMember, (req, res) => {
-    const {title, description} = req.body;
-    const post = new Post({
-        title,
-        description,
-        author: req.user._id,
-    })
-
-    post.save((err,doc) => {
-        req.community.posts.push(post)
-
-        req.community.save((err, doc) => {
-
-            err ? res.json({err}) : res.status(200).json({doc})
-
-        })
-    })
-})
 
 
-router.post('/api/community/:id/:postId', auth, isMember, (req, res) => {
-
-    const comment = {
-        user : req.user._id,
-        name : req.user.name,
-        text : req.body.text
-    }
-
-        Post.findById({'_id': req.params.postId}, (err, post) =>{
-
-            err ? res.json({err}) : post.comments.push(comment)
-
-            post.save((err, newPost) => {
-
-                err ? res.json({err}) : res.status(200).json({newPost})
-
-            })
-
-        })
-    
-})
 
 module.exports = router;
