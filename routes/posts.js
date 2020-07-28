@@ -18,7 +18,12 @@ router.get('/api/post/:id', (req, res) => {
     console.log('anan')
     Post.findById(req.params.id)
             .populate('author')
-            .populate('users').exec((err, post) => {
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'user'
+                }
+            }).exec((err, post) => {
 
             err ? res.status(400).json({err}) : res.status(200).json({post})
     })
@@ -45,8 +50,8 @@ router.post('/api/post/:id/create-post', auth, isMember, (req, res) => {
 })
 
 
-router.post('/api/post/:id/add-comment', auth, isMember, (req, res) => {
-
+router.post('/api/:id/post/:postId/add-comment', auth, isMember, (req, res) => {
+    console.log(req.body)
     const comment = {
         user : req.user._id,
         name : req.user.name,

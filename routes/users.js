@@ -42,7 +42,7 @@ router.post('/api/users/register',
                     
                     const token = jwt.sign(user._id.toHexString(), process.env.SECRET);
             
-                    res.cookie('u_auth', token).status(200).json({
+                    res.cookie('u_auth',  token ,{ expires: new Date(Date.now() + 9000000)}).status(200).json({
                         registerSuccess: true,
                         doc,
                         isAuth: true,

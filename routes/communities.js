@@ -19,6 +19,15 @@ cloudinary.config({
     api_secret: process.env.CLOUD_API_SECRET
 })
 
+router.get('/api/community/auth/:id', auth, isMember, (req,res)=>{
+    res.status(200).json({
+        isMember: true,
+        email: req.user.email,
+        name: req.user.name,
+        lastname: req.user.lastname,
+    })
+})
+
 //ALL COMMUNITIES
 router.get('/api/allCommunities', (req, res) => {
 

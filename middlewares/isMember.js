@@ -3,9 +3,9 @@ const { Community } = require('./../models/community');
 let isMember = (req,res,next) => {
 
     Community.findOne({'_id': req.params.id}, (err, community) => {
-        if(!community) return res.json({memberFailed: true, message: 'Community could not be find'})
+        if(!community) return res.json({isMember: false, message: 'Community could not be find'})
 
-        Community.findOne({'members': req.user._id}, (err, user) => {
+        Community.findOne({'_id': req.params.id,'members': req.user._id}, (err, user) => {
             if(err) return res.json({err})
 
             if(user){
@@ -18,7 +18,7 @@ let isMember = (req,res,next) => {
                     req.community = community
                     next()
                 } 
-                else return res.json({notMember: true, message: 'You should be member, in order to add post'})  
+                else return res.json({isMember: false, message: 'You should be member, in order to add post'})  
             } 
     })
 
