@@ -11,7 +11,11 @@ let auth = (req,res,next) => {
             isAuth: false
         })
 
-        User.findOne({"_id": userId} ,function(err,user){
+        User.findById(userId).
+        populate('memberships').
+        select('-password').
+        exec((err, user) => {
+
             if(err) return err
 
             if(!user) return res.json({
@@ -20,9 +24,11 @@ let auth = (req,res,next) => {
             
             req.user = user
             next();
-        }).select('-password')
-    })
-}
+        })
+           
+        })
+    }
+
 
 
 module.exports = { auth }

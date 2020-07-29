@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const userSchema = mongoose.Schema({
     email:{
@@ -20,6 +21,10 @@ const userSchema = mongoose.Schema({
         type:String,
         required: true,
     },
+    memberships: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Community'
+    }]
     
 });
 

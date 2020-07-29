@@ -15,6 +15,7 @@ router.get('/api/users/auth', auth, (req,res)=>{
         email: req.user.email,
         name: req.user.name,
         lastname: req.user.lastname,
+        memberships: req.user.memberships
     })
 })
 
@@ -42,7 +43,7 @@ router.post('/api/users/register',
                     
                     const token = jwt.sign(user._id.toHexString(), process.env.SECRET);
             
-                    res.cookie('u_auth',  token ,{ expires: new Date(Date.now() + 9000000)}).status(200).json({
+                    res.cookie('u_auth',  token ,{ expires: new Date(Date.now() + 9000000), httpOnly:true, secure: true}).status(200).json({
                         registerSuccess: true,
                         doc,
                         isAuth: true,
@@ -73,7 +74,7 @@ router.post('/api/users/login', (req,res) => {
 
             const token = jwt.sign(user._id.toHexString(), process.env.SECRET);
             
-            res.cookie('u_auth', token, {maxAge: 900000, httpOnly: true})
+            res.cookie('u_auth', token, { expires: new Date(Date.now() + 9000000), httpOnly: true, secure: true})
 
             res.json({isAuth: true, user})
 

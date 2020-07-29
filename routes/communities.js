@@ -86,7 +86,7 @@ router.get('/api/community/:id', (req, res) => {
 
 
 
-router.post('/api/community/uploadimage', formidable(), (req, res) => {
+router.post('/api/community/uploadimage', auth, formidable(), (req, res) => {
     cloudinary.uploader.upload(req.files.file.path, (result) => {
         
         res.status(200).send({
@@ -130,16 +130,19 @@ router.post('/api/community/add-community', auth,
 router.post('/api/community/:id/beMember', auth, (req, res) => {
 
     Community.findById({'_id': req.params.id}, (err, community) => {
-        if(!community) return res.json({memberFailed: true, message: 'Community could not be find'})
+        if(!community) return res.json({isMember: false, message: 'Community could not be find'})
 
         Community.where({'_id': req.params.id}).findOne({'members': req.user._id}, (err, user) => {
             
             
-            if(JSON.stringify(req.user._id) === JSON.stringify(community.founder)) return res.json({memberFailed: true, message: "You are the founder, geez"})
+            if(JSON.stringify(req.user._id) === JSON.stringify(community.founder)) return res.json({isMember: true, message: "You are the founder, geez"})
 
-            if(user) return res.json({memberFailed: true, message: 'You are already member of the community'})
+            if(user) return res.json({isMember: true, message: 'You are already member of the community'})
 
             community.members.push(req.user._id)
+            req.user.memberships.push(req.params.id)
+
+            req.user.save()
 
             community.save((err, doc) => {
 

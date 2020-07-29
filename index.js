@@ -21,7 +21,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
   res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
   res.setHeader('set-cookie', [
-    'same-site-cookie=http://cloudinary.com/; SameSite=Lax',
+    'same-site-cookie=http://cloudinary.com/; SameSite=None; Secure',
     'cross-site-cookie=http://cloudinary.com/; SameSite=None; Secure',
   ]);
   next()
