@@ -71,10 +71,10 @@ router.post('/api/users/login', (req,res) => {
             if(err) return err;
             
             if(!isMatch) return res.json({loginSuccess:false, message:'Email or Password is not correct'});
-
+    
             const token = jwt.sign(user._id.toHexString(), process.env.SECRET);
             
-            res.cookie('u_auth', token, { expires: new Date(Date.now() + 9000000), httpOnly: true, secure: true})
+            res.cookie('u_auth', token, { expires: new Date(Date.now() + 9000000), httpOnly: true})
 
             res.json({isAuth: true, user})
 

@@ -1,17 +1,15 @@
 const mongoose = require('mongoose');
 const express = require('express');
-var cors = require('cors');
 const cookieParser = require('cookie-parser'); 
 
 const app = express()
 var bodyParser = require('body-parser')
 
-var cors = require('cors');
 require('dotenv').config()
 
 
 
-mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopology: true,  autoIndex: false });
+mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true, useUnifiedTopology: true,  autoIndex: false });
 mongoose.set('useCreateIndex', true)
 mongoose.Promise = global.Promise;
 
@@ -36,13 +34,13 @@ app.use(cookieParser());
 // app.use(cors({credentials: true}))
 
 
-
+app.use(express.static('client/build'))
 
 
 //Routes
-const userRoutes    = require("./routes/users")
-const communityRoutes    = require("./routes/communities")
-const postRoutes    = require("./routes/posts")
+const userRoutes    = require('../server/routes/users')
+const communityRoutes    = require("../server/routes/communities")
+const postRoutes    = require("../server/routes/posts")
 
 
 app.get('/', (req, res) => {
@@ -55,7 +53,14 @@ app.use(userRoutes);
 app.use(communityRoutes);
 app.use(postRoutes);
 
+//DEFAULT
+if(process.env.NODE_ENV === 'production'){
+  const path = require('path');
 
+  app.get('/*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'))
+  })
+}
 
 const PORT = process.env.PORT || 3002
 app.listen(PORT);
