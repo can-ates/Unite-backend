@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
     res.send('Hello World')
 })
 
-//XD
+
 //Routes as a middleware
 app.use(userRoutes);
 app.use(communityRoutes);
