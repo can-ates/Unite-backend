@@ -1,15 +1,7 @@
-# Unite-backend
-Back-end of community platform app
+This is my very first full stack project that is spectrum like,redditish community app called UNITE
 
-I am currently developing spectrum chat alike app.
-Node.js     
-Express.js   
-MongoDB     
-Mongoose
-(AS BACKEND)
-will be used throughout this my very first full stack project
+Back-end was created with Node Js and MongoDB
 
-In MVP version of this project, chat will be excluded.
- -Goal is only to allow authenticated users to create communities,
-                                      create posts and
-                                      comment posts
+Main dependencies:
+
+Express js, Mongoose, JWT
