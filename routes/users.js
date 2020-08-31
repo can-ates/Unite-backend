@@ -9,13 +9,16 @@ const { User } = require('../models/user');
 var router  = express.Router();
 
 
+//AUTH USER
 router.get('/api/users/auth', auth, (req,res)=>{
+    
     res.status(200).json({
         isAuth: true,
         email: req.user.email,
         name: req.user.name,
         lastname: req.user.lastname,
-        memberships: req.user.memberships
+        memberships: req.user.memberships,
+        id: req.user._id
     })
 })
 

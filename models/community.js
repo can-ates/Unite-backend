@@ -33,5 +33,7 @@ const communitySchema = mongoose.Schema({
     
 }, {timestamps: true});
 
+
+
 const Community = mongoose.model('Community', communitySchema);
 module.exports = { Community }

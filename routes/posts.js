@@ -15,7 +15,6 @@ var router  = express.Router();
 
 
 router.get('/api/post/:id', (req, res) => {
-    console.log('anan')
     Post.findById(req.params.id)
             .populate('author')
             .populate({
@@ -51,7 +50,6 @@ router.post('/api/post/:id/create-post', auth, isMember, (req, res) => {
 
 
 router.post('/api/:id/post/:postId/add-comment', auth, isMember, (req, res) => {
-    console.log(req.body)
     const comment = {
         user : req.user._id,
         name : req.user.name,
