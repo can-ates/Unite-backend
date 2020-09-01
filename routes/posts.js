@@ -14,21 +14,8 @@ const { isMember } = require('../middlewares/isMember');
 var router  = express.Router();
 
 
-router.get('/api/post/:id', (req, res) => {
-    Post.findById(req.params.id)
-            .populate('author')
-            .populate({
-                path: 'comments',
-                populate: {
-                    path: 'user'
-                }
-            }).exec((err, post) => {
 
-            err ? res.status(400).json({err}) : res.status(200).json({post})
-    })
-})
-
-
+//CREATE POST
 router.post('/api/post/:id/create-post', auth, isMember, (req, res) => {
     const {title, description} = req.body;
     const post = new Post({
@@ -48,7 +35,37 @@ router.post('/api/post/:id/create-post', auth, isMember, (req, res) => {
     })
 })
 
+//READ PARTICULAR POST
+router.get('/api/post/:id', (req, res) => {
+    Post.findById(req.params.id)
+            .populate('author')
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'user'
+                }
+            }).exec((err, post) => {
 
+            err ? res.status(400).json({err}) : res.status(200).json({post})
+    })
+})
+
+
+//UPDATE POST
+router.put('/api/post/:id', (req, res) => {
+    const {title, description} = req.body.dataToSubmit
+
+    Post.findByIdAndUpdate(
+        {_id: req.params.id},
+        {description,
+        title
+        }, (err, doc) => {
+            if(err) return res.json({success: false, err})
+            res.status(200).json(doc)
+        })
+})
+
+//CREATE COMMENT ON POST
 router.post('/api/:id/post/:postId/add-comment', auth, isMember, (req, res) => {
     const comment = {
         user : req.user._id,

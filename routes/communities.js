@@ -21,6 +21,8 @@ cloudinary.config({
   secure: true,
   secure_distribution: 'https://res.cloudinary.com/dqwhaxlxv',
 })
+
+
 //CHECK IF THE USER IS MEMBER OF COMMUNITY
 router.get('/api/community/auth/:id', auth, isMember, (req, res) => {
   res.status(200).json({

@@ -1,0 +1,6 @@
+[submodule "client"]
+	path = client
+	url = https://github.com/can-ates/Unite-frontend
+[submodule "server"]
+	path = server
+	url = https://github.com/can-ates/Unite-backend
