@@ -11,10 +11,13 @@ let isMember = (req,res,next) => {
             if(user){
                 req.community = community
                 next()
+                
             }
 
             if(!user){
+                
                 if(JSON.stringify(req.user._id) === JSON.stringify(community.founder)){
+                    
                     req.community = community
                     next()
                 } 

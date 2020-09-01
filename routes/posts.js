@@ -47,9 +47,9 @@ router.get('/api/post/:id', (req, res) => {
 });
 
 //UPDATE POST
-router.put('/api/post/:id',  auth, isMember, (req, res) => {
+router.put('/api/post/:id',  auth,  (req, res) => {
   const { title, description } = req.body.dataToSubmit;
-
+console.log('asdasd')
   Post.findByIdAndUpdate(
     { _id: req.params.id },
     { description, title },
@@ -61,7 +61,7 @@ router.put('/api/post/:id',  auth, isMember, (req, res) => {
 });
 
 //DELETE POST
-router.delete('/api/post/:id', auth, isMember, (req, res) => {
+router.delete('/api/post/:id', auth, (req, res) => {
 
   Post.deleteOne({ _id: req.params.id }, (err) => {
       if(err) return res.json({ success: false, err });
@@ -105,6 +105,24 @@ router.post('/api/:id/post/:postId/update-comment', auth, isMember, (req, res) =
       });
     });
   });
+
+  //DELETE COMMENT ON POST
+router.post('/api/:id/post/:postId/delete-comment', auth, isMember, (req, res) => {
+    const {_id} = req.body
+  
+    Post.findById({ _id: req.params.postId }, (err, post) => {
+      err ? res.json({ err }) : post.comments.map((comment, i) => {
+        if(comment._id == _id){
+          post.comments.splice(i, 1)
+        }
+    });
+
+      post.save((err, newPost) => {
+        err ? res.json({ err }) : res.status(200).json({ newPost });
+      });
+    });
+  });
+
 
 
 module.exports = router;
