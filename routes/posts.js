@@ -1,7 +1,7 @@
 const express = require('express');
-const cloudinary = require('cloudinary')
-const formidable = require('express-formidable')
-const { check, validationResult} = require('express-validator')
+const cloudinary = require('cloudinary');
+const formidable = require('express-formidable');
+const { check, validationResult } = require('express-validator');
 require('dotenv').config();
 
 const { User } = require('../models/user');
@@ -11,81 +11,79 @@ const { Post } = require('../models/post');
 const { auth } = require('../middlewares/auth');
 const { isMember } = require('../middlewares/isMember');
 
-var router  = express.Router();
-
-
+var router = express.Router();
 
 //CREATE POST
 router.post('/api/post/:id/create-post', auth, isMember, (req, res) => {
-    const {title, description} = req.body;
-    const post = new Post({
-        title,
-        description,
-        author: req.user._id,
-    })
+  const { title, description } = req.body;
+  const post = new Post({
+    title,
+    description,
+    author: req.user._id,
+  });
 
-    post.save((err,doc) => {
-        req.community.posts.push(post)
+  post.save((err, doc) => {
+    req.community.posts.push(post);
 
-        req.community.save((err, doc) => {
-
-            err ? res.json({err}) : res.status(200).json({doc})
-
-        })
-    })
-})
+    req.community.save((err, doc) => {
+      err ? res.json({ err }) : res.status(200).json({ doc });
+    });
+  });
+});
 
 //READ PARTICULAR POST
 router.get('/api/post/:id', (req, res) => {
-    Post.findById(req.params.id)
-            .populate('author')
-            .populate({
-                path: 'comments',
-                populate: {
-                    path: 'user'
-                }
-            }).exec((err, post) => {
-
-            err ? res.status(400).json({err}) : res.status(200).json({post})
+  Post.findById(req.params.id)
+    .populate('author')
+    .populate({
+      path: 'comments',
+      populate: {
+        path: 'user',
+      },
     })
-})
-
+    .exec((err, post) => {
+      err ? res.status(400).json({ err }) : res.status(200).json({ post });
+    });
+});
 
 //UPDATE POST
 router.put('/api/post/:id', (req, res) => {
-    const {title, description} = req.body.dataToSubmit
+  const { title, description } = req.body.dataToSubmit;
 
-    Post.findByIdAndUpdate(
-        {_id: req.params.id},
-        {description,
-        title
-        }, (err, doc) => {
-            if(err) return res.json({success: false, err})
-            res.status(200).json(doc)
-        })
-})
+  Post.findByIdAndUpdate(
+    { _id: req.params.id },
+    { description, title },
+    (err, doc) => {
+      if (err) return res.json({ success: false, err });
+        return res.status(200).json(doc);
+    }
+  );
+});
 
+//DELETE POST
+router.delete('/api/post/:id', (req, res) => {
+
+  Post.deleteOne({ _id: req.params.id }, (err) => {
+      if(err) return res.json({ success: false, err });
+      return res.json({success: true})
+  });
+
+});
 //CREATE COMMENT ON POST
 router.post('/api/:id/post/:postId/add-comment', auth, isMember, (req, res) => {
-    const comment = {
-        user : req.user._id,
-        name : req.user.name,
-        text : req.body.text
-    }
+  const comment = {
+    user: req.user._id,
+    name: req.user.name,
+    text: req.body.text,
+  };
 
-        Post.findById({'_id': req.params.postId}, (err, post) =>{
+  Post.findById({ _id: req.params.postId }, (err, post) => {
+    err ? res.json({ err }) : post.comments.push(comment);
 
-            err ? res.json({err}) : post.comments.push(comment)
-
-            post.save((err, newPost) => {
-
-                err ? res.json({err}) : res.status(200).json({newPost})
-
-            })
-
-        })
-    
-})
-
+    post.save((err, newPost) => {
+      err ? res.json({ err }) : res.status(200).json({ newPost });
+    });
+  });
+});
 
 module.exports = router;
