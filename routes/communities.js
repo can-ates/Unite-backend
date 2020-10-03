@@ -190,7 +190,7 @@ router.post('/api/community/:id/beMember', auth, (req, res) => {
 });
 
 //UPLOAD IMAGE
-router.post('/api/community/uploadimage', auth, formidable(), (req, res) => {
+router.post('/api/community/uploadImage', auth, formidable(), (req, res) => {
   cloudinary.uploader.upload(
     req.files.file.path,
     result => {
@@ -204,6 +204,18 @@ router.post('/api/community/uploadimage', auth, formidable(), (req, res) => {
       resource_type: 'auto',
     }
   );
+});
+
+
+//DELETE IMAGE
+router.post('/api/community/deleteImage', auth, (req, res) => {
+  console.log(req.body)
+  cloudinary.v2.api.delete_resources([`${req.body.public_id}`],
+  function (error, result)  {
+    return res.json({message: 'success'})
+  }
+  )
+  
 });
 
 module.exports = router;
