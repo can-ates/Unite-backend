@@ -209,7 +209,7 @@ router.post('/api/community/uploadImage', auth, formidable(), (req, res) => {
 
 //DELETE IMAGE
 router.post('/api/community/deleteImage', auth, (req, res) => {
-  console.log(req.body)
+  
   cloudinary.v2.api.delete_resources([`${req.body.public_id}`],
   function (error, result)  {
     return res.json({message: 'success'})

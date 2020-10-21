@@ -49,7 +49,7 @@ router.get('/api/post/:id', (req, res) => {
 //UPDATE POST
 router.put('/api/post/:id',  auth,  (req, res) => {
   const { title, description } = req.body.dataToSubmit;
-console.log('asdasd')
+
   Post.findByIdAndUpdate(
     { _id: req.params.id },
     { description, title },
